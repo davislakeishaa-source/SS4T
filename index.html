@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Black & Grey Worksheet Builder — Logo Edition</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+  <meta name="color-scheme" content="dark light">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true"></div>
+      <div>
+        <h1>Black & Grey Worksheet Builder</h1>
+        <p class="sub">Logo edition • copier-friendly, watermark-ready.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2 class="panel-title">Worksheet Settings</h2>
+      <form id="worksheetForm" class="grid" autocomplete="off">
+        <div class="form-control">
+          <label for="company">Company / Watermark</label>
+          <input id="company" type="text" value="SmartSheets 4 Teach" />
+        </div>
+
+        <div class="form-control">
+          <label for="title">Worksheet Title</label>
+          <input id="title" type="text" placeholder="Theme & Summary (RI.6.2)" />
+        </div>
+
+        <div class="form-control">
+          <label for="grade">Grade</label>
+          <select id="grade">
+            <option value="" disabled selected>Select grade</option>
+            <option>K</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            <option>6</option><option>7</option><option>8</option>
+            <option>9</option><option>10</option><option>11</option><option>12</option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label for="subject">Subject</label>
+          <select id="subject">
+            <option value="" disabled selected>Select subject</option>
+            <option>ELA</option><option>Math</option><option>Science</option><option>Social Studies</option>
+            <option>World Languages</option><option>Fine Arts</option><option>Health/PE</option>
+            <option>Computer Science/Tech</option><option>CTE</option><option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label for="standardsSet">Standards Set</label>
+          <select id="standardsSet">
+            <option value="common" selected>Common/National (default)</option>
+            <option value="teks">Texas TEKS (starter)</option>
+            <option value="elagse">Georgia ELA (starter)</option>
+          </select>
+        </div>
+
+        <div class="form-control" id="standardWrapper" style="display:none">
+          <label for="standard">Standard</label>
+          <select id="standard">
+            <option value="">Choose a standard</option>
+          </select>
+          <small class="muted">Optional: selecting a standard tailors prompts.</small>
+        </div>
+
+        <div class="form-control">
+          <label for="topic">Topic / Focus</label>
+          <input id="topic" type="text" placeholder="Summarizing Informational Text" />
+        </div>
+
+        <div class="form-control">
+          <label for="type">Worksheet Type</label>
+          <select id="type">
+            <option value="" disabled selected>Select type</option>
+            <option value="study_guide">Study Guide</option>
+            <option value="guided_notes">Guided Notes</option>
+            <option value="practice">Practice Questions</option>
+            <option value="mixed">Mixed (Study + Practice)</option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label for="difficulty">Difficulty</label>
+          <input type="range" id="difficulty" min="1" max="5" value="3" />
+          <div class="range-label"><span>1</span><span>5</span></div>
+        </div>
+
+        <div class="form-control">
+          <label for="numQuestions"># of Questions (Practice/Mixed)</label>
+          <input id="numQuestions" type="number" value="10" min="1" max="30" />
+        </div>
+
+        <div class="form-control form-control--full">
+          <label>Question Types</label>
+          <div class="qtype-row" role="group" aria-label="Question Types">
+            <label class="checkbox"><input type="checkbox" id="qtypeAuto" checked> <span>Auto mix</span></label>
+            <label class="checkbox"><input type="checkbox" id="qtypeSR" checked> <span>Short Response</span></label>
+            <label class="checkbox"><input type="checkbox" id="qtypeMC"> <span>Multiple Choice</span></label>
+            <label class="checkbox"><input type="checkbox" id="qtypeOrganizer"> <span>Graphic Organizer</span></label>
+            <label class="checkbox"><input type="checkbox" id="qtypeCloze"> <span>Cloze</span></label>
+            <label class="checkbox"><input type="checkbox" id="qtypeCornell"> <span>Cornell Notes</span></label>
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label for="mcKeyPattern">MC Answer Pattern</label>
+          <input id="mcKeyPattern" type="text" placeholder="ABCDABCD..." />
+          <small class="muted">Optional. If blank, rotates A→B→C→D.</small>
+        </div>
+
+        <div class="form-control">
+          <label class="checkbox">
+            <input type="checkbox" id="hideAnswersOnPage" checked />
+            <span>Hide MC answers on question page (show on Answer Key only)</span>
+          </label>
+        </div>
+
+        <div class="form-control form-control--full">
+          <label>MC Answer Controls</label>
+          <div id="mcControlsWrap" class="mc-controls">
+            <div class="mc-controls-empty">Turn on <em>Multiple Choice</em> to activate per-question controls.</div>
+          </div>
+          <div class="mc-controls-actions">
+            <button type="button" id="mcAutoFillBtn">Auto-fill from pattern</button>
+            <button type="button" id="mcClearBtn">Clear all</button>
+          </div>
+        </div>
+
+        <div class="form-control form-control--full">
+          <label for="directions">Directions (optional)</label>
+          <textarea id="directions" rows="3" placeholder="Keep it tight. e.g., Read each passage. Identify the main idea and underline key details."></textarea>
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox"><input type="checkbox" id="includeKey" checked /><span>Include Answer Key</span></label>
+          <label class="checkbox"><input type="checkbox" id="includeGraphics" checked /><span>Include graphic accents (black/grey only)</span></label>
+          <label class="checkbox"><input type="checkbox" id="useLogo" checked /><span>Use logo watermark</span></label>
+        </div>
+
+        <div class="form-control form-control--full">
+          <label>Branding (Logo)</label>
+          <div class="branding-row">
+            <input type="file" id="logoFile" accept="image/svg+xml,image/png" />
+            <button type="button" id="clearLogoBtn">Clear Logo</button>
+            <label>Scale <input id="logoScale" type="range" min="0.6" max="1.6" step="0.1" value="1" /></label>
+          </div>
+          <small class="muted">Upload SVG or PNG. No logo? We auto-generate one from your company name.</small>
+        </div>
+
+        <div class="form-control form-control--full">
+          <label>Templates</label>
+          <div class="template-row">
+            <input id="templateName" type="text" placeholder="Template name (e.g., 7th ELA RI.7.2)" />
+            <button type="button" id="saveTemplateBtn">Save Template</button>
+            <select id="templateSelect"><option value="">Load a saved template…</option></select>
+            <button type="button" id="deleteTemplateBtn">Delete</button>
+            <button type="button" id="exportJsonBtn">Export JSON</button>
+            <input type="file" id="importJsonInput" accept="application/json" style="display:none" />
+            <button type="button" id="importJsonBtn">Import JSON</button>
+            <button type="button" id="resetFormBtn">Reset Form</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="previewBtn" type="button">Preview</button>
+          <button id="downloadBtn" type="button" class="primary">Download PDF</button>
+          <button id="downloadDocxBtn" type="button">Download DOCX</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Live Preview (Print-look)</h2>
+      <div class="preview">
+        <div class="preview-inner">
+          <div class="preview-page" id="previewPage">
+            <div class="preview-header">
+              <div class="name-date"><span>Name: ____________________</span><span>Date: ___________</span></div>
+              <h3 id="prevTitle">Worksheet Title</h3>
+              <div class="meta" id="prevMeta">Grade — Subject — Topic</div>
+              <div class="divider"></div>
+            </div>
+            <div id="prevBody" class="preview-body">
+              <p>Click <strong>Preview</strong> to generate a print-style view. Use <strong>Download PDF</strong> or <strong>DOCX</strong> to export.</p>
+            </div>
+            <div class="preview-footer">
+              <img id="prevLogo" alt="logo" />
+              <span id="prevWatermark">© Your Company • For classroom use</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>Built for teachers. Black & grey by design—copier-friendly and sharp.</small>
+  </footer>
+
+  <script src="standards.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
